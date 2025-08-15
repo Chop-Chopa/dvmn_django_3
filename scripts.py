@@ -45,6 +45,7 @@ def fix_marks(schoolkid):
     except Schoolkid.MultipleObjectsReturned:
         print("Найдено несколько учеников. Уточните ФИО")
 
+
 def remove_chastisements(schoolkid):
     try:
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
@@ -58,7 +59,11 @@ def remove_chastisements(schoolkid):
 def create_commendation(schoolkid, item):
     try:
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
-        lesson = Lesson.objects.filter(year_of_study=child.year_of_study,group_letter=child.group_letter,subject__title=item).first()
+        lessons = Lesson.objects.filter(year_of_study=child.year_of_study,group_letter=child.group_letter,subject__title=item)
+        if not lessons.exists():
+            print('Предмет не найден')
+            return
+        lesson = lessons.first()
         random_compliment = random.choice(COMPLIMENTS)
         commendation = Commendation.objects.create(text=random_compliment,created=lesson.date, schoolkid = child, subject = lesson.subject, teacher = lesson.teacher)
     except Schoolkid.DoesNotExist:
